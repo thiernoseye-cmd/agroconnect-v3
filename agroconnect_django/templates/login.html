@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgroConnect — Connexion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--g:#2E7D32;--g2:#388E3C;--g3:#E8F5E9;--g4:#1B5E20;--err:#d32f2f;--bg:#F4F6F0;--card:#fff;--txt:#1a1a1a;--mu:#6B7280;--brd:#E5E7EB;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .wrap{width:100%;max-width:440px}
+  .logo-box{text-align:center;margin-bottom:24px}
+  .logo-ic{width:64px;height:64px;background:var(--g);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 10px}
+  .logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;color:var(--g4)}
+  .logo-sub{font-size:13px;color:var(--mu);margin-top:4px}
+  .card{background:var(--card);border-radius:18px;border:1px solid var(--brd);padding:30px;box-shadow:0 4px 24px rgba(0,0,0,.07)}
+  .auth-tabs{display:flex;border-bottom:2px solid var(--brd);margin-bottom:24px}
+  .auth-tab{flex:1;padding:10px;text-align:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;cursor:pointer;color:var(--mu);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s}
+  .auth-tab.on{color:var(--g);border-bottom-color:var(--g)}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:13px;font-weight:600;color:var(--txt);margin-bottom:5px}
+  .field input,.field select{width:100%;padding:11px 14px;border:1.5px solid var(--brd);border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .15s;color:var(--txt);background:#fff}
+  .field input:focus,.field select:focus{border-color:var(--g)}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .btn{width:100%;padding:13px;background:var(--g);color:#fff;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;cursor:pointer;margin-top:6px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn:hover{background:var(--g4)}
+  .btn:disabled{opacity:.6;cursor:not-allowed}
+  .msg{display:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;text-align:center;margin-bottom:14px}
+  .msg.err{background:#FFF0F0;color:var(--err);border:1px solid #f5c6c6}
+  .msg.ok{background:#E8F5E9;color:var(--g4);border:1px solid #C8E6C9}
+  .sp{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .switch-link{text-align:center;margin-top:16px;font-size:13px;color:var(--mu)}
+  .switch-link span{color:var(--g);font-weight:700;cursor:pointer;text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo-box">
+    <div class="logo-ic">🌿</div>
+    <div class="logo-name">AgroConnect</div>
+    <div class="logo-sub">Le réseau social des agriculteurs sénégalais</div>
+  </div>
+  <div class="card">
+    <div class="auth-tabs">
+      <div class="auth-tab on" id="tab-login"    onclick="showTab('login')">🔑 Connexion</div>
+      <div class="auth-tab"    id="tab-register"  onclick="showTab('register')">✏️ Créer un compte</div>
+    </div>
+
+    <!-- CONNEXION -->
+    <div id="form-login">
+      <div class="msg err" id="login-err"></div>
+      <div class="field"><label>Pseudo</label><input type="text" id="l-pseudo" placeholder="Votre pseudo" autocomplete="username"></div>
+      <div class="field"><label>Mot de passe</label><input type="password" id="l-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn" id="login-btn" onclick="doLogin()">
+        <div class="sp" id="login-sp"></div><span id="login-btn-txt">Se connecter</span>
+      </button>
+      <div class="switch-link">Pas encore de compte ? <span onclick="showTab('register')">Créer un compte</span></div>
+    </div>
+
+    <!-- INSCRIPTION -->
+    <div id="form-register" style="display:none">
+      <div class="msg err" id="reg-err"></div>
+      <div class="msg ok"  id="reg-ok"></div>
+      <div class="field"><label>Pseudo *</label><input type="text" id="r-pseudo" placeholder="ex: AgriDiallo_Casamance"></div>
+      <div class="field-row">
+        <div class="field">
+          <label>Région *</label>
+          <select id="r-region">
+            <option value="">— Choisir —</option>
+            <option>Dakar</option><option>Thiès</option><option>Saint-Louis</option>
+            <option>Diourbel</option><option>Fatick</option><option>Kaolack</option>
+            <option>Kaffrine</option><option>Ziguinchor</option><option>Kolda</option>
+            <option>Sédhiou</option><option>Tambacounda</option><option>Kédougou</option>
+            <option>Louga</option><option>Matam</option><option>Sine Saloum</option>
+            <option>Casamance</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Type de culture *</label>
+          <select id="r-culture">
+            <option value="">— Choisir —</option>
+            <option>mil</option><option>arachide</option><option>riz</option>
+            <option>maïs</option><option>coton</option><option>sorgho</option>
+            <option>niébé</option><option>bissap</option><option>fonio</option>
+            <option>mangue</option><option>maraîchage</option><option>arboriculture</option>
+            <option>élevage</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Mot de passe *</label><input type="password" id="r-password" placeholder="Minimum 6 caractères"></div>
+      <div class="field"><label>Confirmer le mot de passe *</label><input type="password" id="r-confirm" placeholder="Répétez le mot de passe" onkeydown="if(event.key==='Enter')doRegister()"></div>
+      <button class="btn" id="reg-btn" onclick="doRegister()">
+        <div class="sp" id="reg-sp"></div><span id="reg-btn-txt">✅ Créer mon compte</span>
+      </button>
+      <div class="switch-link">Déjà inscrit ? <span onclick="showTab('login')">Se connecter</span></div>
+    </div>
+  </div>
+</div>
+<script>
+function showTab(tab){
+  document.getElementById('form-login').style.display    = tab==='login'    ? '' : 'none';
+  document.getElementById('form-register').style.display = tab==='register' ? '' : 'none';
+  document.getElementById('tab-login').classList.toggle('on',    tab==='login');
+  document.getElementById('tab-register').classList.toggle('on', tab==='register');
+  ['login-err','reg-err','reg-ok'].forEach(id=>{const el=document.getElementById(id);el.style.display='none';el.textContent='';});
+}
+function setLoading(btnId,spId,txtId,text,loading){
+  document.getElementById(btnId).disabled=loading;
+  document.getElementById(spId).style.display=loading?'block':'none';
+  document.getElementById(txtId).textContent=text;
+}
+function showMsg(id,msg,type='err'){
+  const el=document.getElementById(id);el.className=`msg ${type}`;el.textContent=msg;el.style.display='block';
+}
+async function doLogin(){
+  const pseudo=document.getElementById('l-pseudo').value.trim();
+  const password=document.getElementById('l-password').value.trim();
+  document.getElementById('login-err').style.display='none';
+  if(!pseudo||!password){showMsg('login-err','❌ Veuillez remplir tous les champs.');return;}
+  setLoading('login-btn','login-sp','login-btn-txt','Connexion…',true);
+  try{
+    const res=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pseudo,password})});
+    const data=await res.json();
+    if(data.ok){window.location.href='/';}
+    else{showMsg('login-err','❌ '+(data.error||'Identifiants incorrects.'));setLoading('login-btn','login-sp','login-btn-txt','Se connecter',false);}
+  }catch(e){showMsg('login-err','❌ Erreur réseau. Réessayez.');setLoading('login-btn','login-sp','login-btn-txt','Se connecter',false);}
+}
+async function doRegister(){
+  const pseudo=document.getElementById('r-pseudo').value.trim();
+  const region=document.getElementById('r-region').value;
+  const culture=document.getElementById('r-culture').value;
+  const password=document.getElementById('r-password').value;
+  const confirm=document.getElementById('r-confirm').value;
+  document.getElementById('reg-err').style.display='none';
+  document.getElementById('reg-ok').style.display='none';
+  if(!pseudo||!region||!culture||!password||!confirm){showMsg('reg-err','❌ Tous les champs sont obligatoires.');return;}
+  if(pseudo.length<3){showMsg('reg-err','❌ Le pseudo doit faire au moins 3 caractères.');return;}
+  if(password.length<6){showMsg('reg-err','❌ Le mot de passe doit faire au moins 6 caractères.');return;}
+  if(password!==confirm){showMsg('reg-err','❌ Les mots de passe ne correspondent pas.');return;}
+  setLoading('reg-btn','reg-sp','reg-btn-txt','Création…',true);
+  try{
+    const res=await fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pseudo,region,type_culture:culture,password})});
+    const data=await res.json();
+    if(data.ok){showMsg('reg-ok','✅ Compte créé avec succès ! Connexion en cours…','ok');setTimeout(()=>{window.location.href='/';},1200);}
+    else{showMsg('reg-err','❌ '+(data.error||'Erreur lors de la création.'));setLoading('reg-btn','reg-sp','reg-btn-txt','✅ Créer mon compte',false);}
+  }catch(e){showMsg('reg-err','❌ Erreur réseau. Réessayez.');setLoading('reg-btn','reg-sp','reg-btn-txt','✅ Créer mon compte',false);}
+}
+</script>
+</body>
+</html>
