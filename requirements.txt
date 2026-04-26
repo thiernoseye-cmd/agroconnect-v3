@@ -1,2 +1,5 @@
 django>=4.2
 pymongo>=4.0
+gunicorn>=21.0
+whitenoise>=6.6
+requests>=2.28
