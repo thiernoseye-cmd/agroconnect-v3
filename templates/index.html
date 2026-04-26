@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AgroConnect — Réseau Agricole</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#2E7D32;--g2:#388E3C;--g3:#E8F5E9;--g4:#1B5E20;
+  --bg:#F4F6F0;--card:#fff;--txt:#1a1a1a;--mu:#6B7280;
+  --brd:#E5E7EB;--err:#d32f2f;--warn:#f57c00;
+  --shadow:0 2px 12px rgba(0,0,0,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+
+/* ── NAV ── */
+.nav{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--brd);
+     display:flex;align-items:center;padding:0 20px;height:54px;gap:16px;box-shadow:var(--shadow)}
+.nav-brand{display:flex;align-items:center;gap:8px;text-decoration:none}
+.nav-leaf{font-size:22px}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--g4)}
+.nav-tabs{display:flex;flex:1;margin-left:20px}
+.ntab{padding:0 18px;height:54px;border:none;background:none;color:var(--mu);font-size:13px;
+      font-weight:600;cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;
+      font-family:'Inter',sans-serif}
+.ntab:hover{color:var(--txt);background:#fafafa}
+.ntab.on{color:var(--g);border-bottom-color:var(--g)}
+.nav-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.stat-pill{font-size:12px;font-weight:600;color:var(--mu);padding:4px 10px;
+           background:var(--g3);border-radius:20px}
+.auto-btn{padding:6px 14px;border:none;border-radius:8px;font-size:12px;font-weight:700;
+          cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
+.auto-btn.start{background:var(--g3);color:var(--g4)}
+.auto-btn.start:hover{background:var(--g);color:#fff}
+.auto-btn.stop{background:#FFEBEE;color:var(--err)}
+.nav-user{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.nav-avatar{width:30px;height:30px;border-radius:50%;background:var(--g);color:#fff;
+            display:flex;align-items:center;justify-content:center;font-size:10px;
+            font-family:'Syne',sans-serif;font-weight:800}
+.nav-role-badge{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.nav-role-badge.admin{background:#FFF8E1;color:#E65100}
+.nav-role-badge.user{background:var(--g3);color:var(--g4)}
+.btn-logout{padding:6px 12px;background:#f3f4f6;color:var(--mu);border:none;border-radius:8px;
+            font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-logout:hover{background:#fee2e2;color:var(--err)}
+
+/* ── LAYOUT ── */
+.layout{display:grid;grid-template-columns:230px 1fr 220px;gap:18px;
+        max-width:1200px;margin:0 auto;padding:18px 16px}
+
+/* ── LEFT SIDEBAR ── */
+.lsb{display:flex;flex-direction:column;gap:10px}
+.card{background:var(--card);border:1px solid var(--brd);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+.sb-title{font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:var(--mu);
+          text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.mi{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;
+    font-size:13px;font-weight:500;cursor:pointer;transition:all .12s}
+.mi:hover{background:var(--g3)}
+.mi.on{background:var(--g3);color:var(--g4);font-weight:700}
+.mi-ic{font-size:15px;width:20px;text-align:center}
+.mi-badge{margin-left:auto;background:var(--g);color:#fff;border-radius:10px;
+          font-size:10px;font-weight:700;padding:1px 6px}
+.mi-badge.warn{background:var(--warn)}
+.tag-list{display:flex;flex-wrap:wrap;gap:5px}
+.tag{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;transition:all .12s}
+.tag:hover{filter:brightness(.92)}
+.tag.irr{background:#E3F2FD;color:#1565C0}
+.tag.fert{background:#F3E5F5;color:#6A1B9A}
+.tag.sem{background:#E8F5E9;color:#2E7D32}
+.tag.rec{background:#FFF8E1;color:#E65100}
+.tag.met{background:#E0F7FA;color:#00695C}
+.tag.mal{background:#FFEBEE;color:#C62828}
+.tag.ins{background:#FBE9E7;color:#BF360C}
+.tag.exp{background:#E8EAF6;color:#283593}
+.tag.bio{background:#F1F8E9;color:#33691E}
+.tag.tec{background:#EDE7F6;color:#4527A0}
+.tag.con{background:#E0F2F1;color:#00695C}
+.tag.mar{background:#FFF3E0;color:#E65100}
+.tag.eau{background:#E1F5FE;color:#01579B}
+.tag.sol{background:#EFEBE9;color:#4E342E}
+.tag.def{background:#F5F5F5;color:#424242}
+
+/* ── FEED ── */
+.feed{display:flex;flex-direction:column;gap:14px}
+.loading{display:flex;align-items:center;gap:10px;padding:30px;color:var(--mu);justify-content:center}
+.spinner{width:20px;height:20px;border:2.5px solid var(--brd);border-top-color:var(--g);
+         border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:50px 20px;color:var(--mu)}
+.empty-ic{font-size:40px;margin-bottom:10px}
+
+/* ── POST CARD ── */
+.post{background:var(--card);border:1px solid var(--brd);border-radius:14px;
+      overflow:hidden;box-shadow:var(--shadow);transition:transform .12s}
+.post:hover{transform:translateY(-1px)}
+.post.pinned{border:2px solid #FFD700;background:#FFFDF0}
+.pin-badge{background:#FFD700;color:#5D4037;font-size:11px;font-weight:700;
+           padding:4px 12px;display:flex;align-items:center;gap:5px}
+.post-hdr{display:flex;align-items:center;gap:10px;padding:14px 14px 0}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-family:'Syne',sans-serif;font-weight:800;font-size:11px;flex-shrink:0;cursor:pointer}
+.post-meta{flex:1;min-width:0}
+.post-author{font-weight:700;font-size:14px;cursor:pointer}
+.post-author:hover{text-decoration:underline}
+.post-sub{font-size:11px;color:var(--mu)}
+.post-body{padding:10px 14px;font-size:14px;line-height:1.6;color:var(--txt)}
+.post-img{width:100%;max-height:280px;object-fit:cover;cursor:pointer}
+.post-tags{padding:0 14px 8px;display:flex;flex-wrap:wrap;gap:5px}
+.react-bar{display:flex;gap:16px;padding:6px 14px;font-size:13px;color:var(--mu)}
+.rc{cursor:pointer;transition:color .12s;display:flex;align-items:center;gap:4px}
+.rc:hover{color:var(--g)}
+.post-acts{display:flex;align-items:center;gap:8px;padding:8px 14px 14px;border-top:1px solid var(--brd)}
+.pa{display:flex;align-items:center;gap:5px;padding:6px 14px;border:1.5px solid var(--brd);
+    border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:var(--card);
+    color:var(--mu);transition:all .15s;font-family:'Inter',sans-serif}
+.pa:hover{border-color:var(--g);color:var(--g);background:var(--g3)}
+.pa.liked{color:#e53935;border-color:#e53935;background:#FFF0F0}
+.pa.liked:hover{background:#e53935;color:#fff}
+.pa svg{width:14px;height:14px}
+.pa-admin{margin-left:auto;display:flex;gap:6px}
+.pa-admin .pa{font-size:11px;padding:5px 10px}
+.pa-admin .pa.pin{border-color:#FFD700;color:#5D4037;background:#FFFDE7}
+.pa-admin .pa.pin:hover{background:#FFD700}
+.pa-admin .pa.del-post{border-color:#f5c6c6;color:var(--err);background:#FFF0F0}
+.pa-admin .pa.del-post:hover{background:var(--err);color:#fff}
+
+/* ── SIGNAL ── */
+.pa.signale{color:var(--warn);border-color:var(--warn);background:#FFF8F0}
+.signal-badge{font-size:10px;background:var(--warn);color:#fff;border-radius:10px;
+              padding:1px 5px;margin-left:4px}
+
+/* ── COMMENTAIRES ── */
+.cw{display:none;border-top:1px solid var(--brd)}
+.cw.open{display:block}
+.comm-list{padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+.comm{display:flex;gap:8px}
+.comm-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+         justify-content:center;font-family:'Syne',sans-serif;font-weight:800;
+         font-size:9px;flex-shrink:0}
+.comm-body{flex:1;background:var(--bg);border-radius:8px;padding:7px 10px}
+.comm-author{font-weight:700;font-size:12px}
+.comm-text{font-size:13px;color:var(--txt);margin-top:2px}
+.comm-input-row{display:flex;gap:8px;padding:8px 14px 12px}
+.comm-input{flex:1;padding:8px 12px;border:1.5px solid var(--brd);border-radius:8px;
+            font-size:13px;outline:none;font-family:'Inter',sans-serif}
+.comm-input:focus{border-color:var(--g)}
+.comm-send{padding:8px 14px;background:var(--g);color:#fff;border:none;border-radius:8px;
+           font-size:12px;font-weight:700;cursor:pointer;transition:background .15s}
+.comm-send:hover{background:var(--g4)}
+
+/* ── NEW POST ── */
+.new-post{background:var(--card);border:1px solid var(--brd);border-radius:14px;
+          padding:14px;box-shadow:var(--shadow);margin-bottom:0}
+.np-row{display:flex;gap:10px;align-items:flex-start}
+.np-area{flex:1;padding:10px 12px;border:1.5px solid var(--brd);border-radius:10px;
+         font-size:14px;font-family:'Inter',sans-serif;resize:none;outline:none;
+         min-height:72px;transition:border-color .15s}
+.np-area:focus{border-color:var(--g)}
+.np-footer{display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap}
+.np-tag-input{flex:1;min-width:140px;padding:7px 12px;border:1.5px solid var(--brd);
+              border-radius:8px;font-size:12px;outline:none;font-family:'Inter',sans-serif}
+.np-tag-input:focus{border-color:var(--g)}
+.np-submit{padding:8px 18px;background:var(--g);color:#fff;border:none;border-radius:8px;
+           font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;
+           font-family:'Syne',sans-serif}
+.np-submit:hover{background:var(--g4)}
+.np-submit:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── FILTRES ── */
+.filters{background:var(--card);border:1px solid var(--brd);border-radius:10px;
+         padding:10px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filter-sel{padding:6px 10px;border:1.5px solid var(--brd);border-radius:8px;
+            font-size:12px;font-family:'Inter',sans-serif;outline:none;background:#fff}
+.filter-sel:focus{border-color:var(--g)}
+.filter-clear{padding:6px 12px;background:#f3f4f6;border:none;border-radius:8px;
+              font-size:12px;font-weight:600;cursor:pointer;color:var(--mu)}
+.filter-clear:hover{background:#fee2e2;color:var(--err)}
+
+/* ── RIGHT SIDEBAR ── */
+.rsb{display:flex;flex-direction:column;gap:10px}
+.promo{background:linear-gradient(135deg,var(--g4),var(--g2));border-radius:14px;
+       padding:14px;color:#fff}
+.promo-title{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;margin-bottom:6px}
+.promo-text{font-size:12px;opacity:.85;line-height:1.5}
+.user-list{display:flex;flex-direction:column;gap:6px}
+.ul-item{display:flex;align-items:center;gap:8px;padding:5px;border-radius:8px;cursor:pointer}
+.ul-item:hover{background:var(--g3)}
+.ul-info .name{font-size:12px;font-weight:700}
+.ul-info .sub{font-size:11px;color:var(--mu)}
+
+/* ── TOP 3 ── */
+.top3-badge{display:inline-block;padding:2px 8px;background:#FFD700;color:#333;
+            border-radius:20px;font-size:11px;font-weight:700;margin-left:8px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;
+       font-size:13px;font-weight:700;z-index:999;animation:fadeIn .25s ease;
+       box-shadow:0 4px 20px rgba(0,0,0,.15);pointer-events:none}
+.toast.ok{background:var(--g);color:#fff}
+.toast.err{background:var(--err);color:#fff}
+.toast.warn{background:var(--warn);color:#fff}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── LIGHTBOX ── */
+#lbBg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;
+      align-items:center;justify-content:center;cursor:zoom-out}
+#lbBg.open{display:flex}
+#lbImg{max-width:90vw;max-height:88vh;border-radius:10px}
+
+/* ── POPUP LIKERS ── */
+.popup-overlay{position:fixed;inset:0;z-index:150}
+
+/* ══════════════════════════════════════════════════
+   ADMIN PANEL
+══════════════════════════════════════════════════ */
+.admin-wrap{max-width:1050px;margin:0 auto}
+.admin-header{background:linear-gradient(135deg,var(--g4),var(--g2));border-radius:14px;
+              padding:18px 22px;color:#fff;margin-bottom:14px;
+              display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.admin-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;
+             display:flex;align-items:center;gap:10px}
+.admin-kpis{display:flex;gap:10px;flex-wrap:wrap}
+.kpi{background:rgba(255,255,255,.15);border-radius:10px;padding:9px 16px;text-align:center;min-width:85px}
+.kpi-v{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem}
+.kpi-l{font-size:10px;opacity:.85;margin-top:1px}
+.admin-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.atab{padding:8px 18px;border:2px solid var(--brd);border-radius:10px;font-size:13px;
+      font-weight:700;cursor:pointer;background:var(--card);color:var(--mu);transition:all .15s;
+      font-family:'Inter',sans-serif}
+.atab:hover{border-color:var(--g);color:var(--g)}
+.atab.on{background:var(--g);color:#fff;border-color:var(--g)}
+.admin-section{background:var(--card);border-radius:14px;border:1px solid var(--brd);
+               overflow:hidden;box-shadow:var(--shadow)}
+.admin-section-hdr{padding:12px 16px;border-bottom:1px solid var(--brd);
+                   display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.admin-section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;
+                     display:flex;align-items:center;gap:8px}
+.admin-search{padding:7px 12px;border:1.5px solid var(--brd);border-radius:8px;font-size:12px;
+              outline:none;width:200px;font-family:'Inter',sans-serif}
+.admin-search:focus{border-color:var(--g)}
+.admin-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--g3);
+             color:var(--g4);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;min-width:26px}
+.admin-badge.warn{background:#FFF8E1;color:var(--warn)}
+.admin-table{width:100%;border-collapse:collapse;font-size:13px}
+.admin-table th{padding:9px 12px;text-align:left;background:var(--bg);color:var(--mu);
+                font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.06em;
+                border-bottom:1px solid var(--brd)}
+.admin-table td{padding:9px 12px;border-bottom:1px solid var(--brd);vertical-align:middle}
+.admin-table tr:last-child td{border:none}
+.admin-table tr:hover td{background:#faf9f6}
+.adm-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+        font-family:'Syne',sans-serif;font-weight:800;font-size:9px;flex-shrink:0}
+.adm-user{display:flex;align-items:center;gap:8px}
+.adm-user-info .name{font-weight:700;font-size:13px}
+.adm-user-info .sub{font-size:11px;color:var(--mu)}
+.adm-post-cell{max-width:220px}
+.adm-post-author{font-weight:700;font-size:11px;color:var(--g4);margin-bottom:2px}
+.adm-post-excerpt{font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.adm-comment-text{font-size:13px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.adm-date{font-size:11px;color:var(--mu);white-space:nowrap}
+.adm-status{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;
+            font-size:11px;font-weight:700}
+.adm-status.actif{background:var(--g3);color:var(--g4)}
+.adm-status.suspendu{background:#FFEBEE;color:var(--err)}
+.del-btn{padding:4px 10px;background:#FFF0F0;color:var(--err);border:1px solid #f5c6c6;
+         border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.del-btn:hover{background:var(--err);color:#fff;border-color:var(--err)}
+.susp-btn{padding:4px 10px;background:#FFF8E1;color:var(--warn);border:1px solid #FFCC80;
+          border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.susp-btn:hover{background:var(--warn);color:#fff}
+.react-btn{padding:4px 10px;background:var(--g3);color:var(--g4);border:1px solid #C8E6C9;
+           border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.react-btn:hover{background:var(--g);color:#fff}
+.admin-empty{padding:36px;text-align:center;color:var(--mu)}
+.admin-empty .ic{font-size:32px;margin-bottom:6px}
+.adm-refresh{padding:6px 12px;background:var(--g3);color:var(--g4);border:none;border-radius:8px;
+             font-size:11px;font-weight:700;cursor:pointer;transition:all .15s}
+.adm-refresh:hover{background:var(--g);color:#fff}
+
+/* Dashboard */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.dash-card{background:var(--card);border:1px solid var(--brd);border-radius:12px;padding:14px}
+.dash-card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:12px;
+                 display:flex;align-items:center;gap:6px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
+.bar-label{width:70px;text-align:right;color:var(--mu);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-wrap{flex:1;height:10px;background:var(--bg);border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;background:var(--g);border-radius:5px;transition:width .4s ease}
+.bar-val{width:30px;font-weight:700;font-size:11px;text-align:right}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:6px}
+
+/* Logs */
+.log-row{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid var(--brd)}
+.log-row:last-child{border:none}
+.log-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.log-info .log-action{font-size:12px;font-weight:700}
+.log-info .log-details{font-size:11px;color:var(--mu)}
+.log-date{font-size:10px;color:var(--mu);margin-left:auto;white-space:nowrap}
+
+/* ── Responsive ── */
+@media(max-width:1100px){.layout{grid-template-columns:200px 1fr}.rsb{display:none}}
+@media(max-width:768px){.layout{grid-template-columns:1fr;padding:10px}.lsb{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <div class="nav-brand">
+    <div class="nav-leaf">🌿</div>
+    <span class="nav-logo">AgroConnect</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="ntab on" onclick="switchView('feed',this)">🏠 Fil</button>
+    <button class="ntab" onclick="switchView('requetes',this)">🔍 Requêtes</button>
+    <button class="ntab" onclick="switchView('top3',this)">🏆 Top 3</button>
+    {% if user_role == 'admin' %}
+    <button class="ntab" id="ntab-admin" onclick="switchView('admin',this)">
+      ⚙️ Admin
+      <span id="nav-signal-badge" style="display:none;background:#f57c00;color:#fff;
+            border-radius:50%;font-size:9px;font-weight:800;padding:1px 5px;margin-left:4px">0</span>
+    </button>
+    {% endif %}
+  </div>
+  <div class="nav-right">
+    <div class="stat-pill">📝 <span id="statPosts">–</span></div>
+    <div class="stat-pill">❤️ <span id="statLikes">–</span></div>
+    <button class="auto-btn start" id="autoBtn" onclick="toggleAuto()">▶ Auto</button>
+    <div class="nav-user">
+      <div class="nav-avatar" id="navAvatar">{{ user_pseudo|slice:":2"|upper }}</div>
+      <span>{{ user_pseudo }}</span>
+      <span class="nav-role-badge {{ user_role }}">
+        {% if user_role == 'admin' %}👑 Admin{% else %}🌾 User{% endif %}
+      </span>
+    </div>
+    <a href="/logout"><button class="btn-logout">Déconnexion</button></a>
+  </div>
+</nav>
+
+<!-- ══ LIGHTBOX ══ -->
+<div id="lbBg" onclick="this.classList.remove('open')">
+  <img id="lbImg" src="" alt="">
+</div>
+
+<!-- ══ LAYOUT ══ -->
+<div class="layout">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="lsb">
+    <div class="card">
+      <div class="sb-title">📋 Filtres</div>
+      <div class="mi on" id="mi-all" onclick="applyFilter(null,null)">
+        <span class="mi-ic">🌍</span> Toutes les publications
+      </div>
+      <div style="height:6px"></div>
+      <div class="sb-title">👥 Agriculteurs</div>
+      <div id="sideUsers"></div>
+    </div>
+    <div class="card">
+      <div class="sb-title">🏷️ Tags populaires</div>
+      <div class="tag-list" id="sideTags"></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- VUE FEED -->
+    <div id="view-feed">
+      <!-- Nouvelle publication -->
+      <div class="new-post card" style="margin-bottom:14px">
+        <div class="np-row">
+          <div class="av" id="npAvatar" style="background:var(--g);color:#fff">{{ user_pseudo|slice:":2"|upper }}</div>
+          <textarea class="np-area" id="npText" placeholder="Partagez vos techniques agricoles…" rows="3"></textarea>
+        </div>
+        <div class="np-footer">
+          <input class="np-tag-input" id="npTags" placeholder="Tags : irrigation, semences…">
+          <button class="np-submit" id="npBtn" onclick="publishPost()">📢 Publier</button>
+        </div>
+      </div>
+      <!-- Filtres -->
+      <div class="filters" style="margin-bottom:12px">
+        <select class="filter-sel" id="userFilter" onchange="onUserFilter()">
+          <option value="">👤 Tous les agriculteurs</option>
+        </select>
+        <select class="filter-sel" id="tagFilter" onchange="onTagFilter()">
+          <option value="">🏷️ Tous les tags</option>
+        </select>
+        <button class="filter-clear" onclick="clearFilters()">✕ Effacer</button>
+      </div>
+      <!-- Posts -->
+      <div class="feed" id="feedCont">
+        <div class="loading"><div class="spinner"></div> Chargement du fil…</div>
+      </div>
+    </div>
+
+    <!-- VUE REQUÊTES -->
+    <div id="view-requetes" style="display:none">
+      <div class="card">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:16px">🔍 Requêtes Avancées</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="filters">
+            <label style="font-size:13px;font-weight:600">Tag :</label>
+            <input id="rqTag" class="np-tag-input" placeholder="ex: irrigation" style="flex:1">
+            <button class="np-submit" onclick="rqTag()">Rechercher</button>
+          </div>
+          <div class="filters">
+            <label style="font-size:13px;font-weight:600">Suivis de :</label>
+            <select id="rqUser" class="filter-sel" style="flex:1"><option value="">— choisir —</option></select>
+            <button class="np-submit" onclick="rqSuivis()">Voir</button>
+          </div>
+        </div>
+        <div id="rqResults" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+    <!-- VUE TOP 3 -->
+    <div id="view-top3" style="display:none">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-bottom:14px">🏆 Top 3 Publications</div>
+      <div class="feed" id="top3Cont"><div class="loading"><div class="spinner"></div>Chargement…</div></div>
+    </div>
+
+    <!-- VUE ADMIN -->
+    {% if user_role == 'admin' %}
+    <div id="view-admin" style="display:none">
+      <div class="admin-wrap">
+
+        <!-- Header KPIs -->
+        <div class="admin-header">
+          <div class="admin-title">⚙️ Panneau Administrateur</div>
+          <div class="admin-kpis">
+            <div class="kpi"><div class="kpi-v" id="kpi-posts">–</div><div class="kpi-l">📝 Posts</div></div>
+            <div class="kpi"><div class="kpi-v" id="kpi-likes">–</div><div class="kpi-l">❤️ Likes</div></div>
+            <div class="kpi"><div class="kpi-v" id="kpi-comments">–</div><div class="kpi-l">💬 Commentaires</div></div>
+            <div class="kpi"><div class="kpi-v" id="kpi-users">–</div><div class="kpi-l">👤 Utilisateurs</div></div>
+            <div class="kpi"><div class="kpi-v" id="kpi-signales" style="color:#FFD700">–</div><div class="kpi-l">🚩 Signalements</div></div>
+          </div>
+        </div>
+
+        <!-- Sub-onglets Admin -->
+        <div class="admin-tabs">
+          <button class="atab on" onclick="admTab('dashboard')">📊 Dashboard</button>
+          <button class="atab" onclick="admTab('likes')">❤️ Likes</button>
+          <button class="atab" onclick="admTab('comments')">💬 Commentaires</button>
+          <button class="atab" onclick="admTab('signales')">🚩 Signalements <span id="signales-count-badge" class="admin-badge warn" style="margin-left:4px">0</span></button>
+          <button class="atab" onclick="admTab('users')">👤 Utilisateurs</button>
+          <button class="atab" onclick="admTab('logs')">📋 Journal</button>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="adm-dashboard" class="admin-section">
+          <div class="admin-section-hdr">
+            <div class="admin-section-title">📊 Tableau de bord</div>
+            <button class="adm-refresh" onclick="loadAdmDashboard()">↻ Rafraîchir</button>
+          </div>
+          <div style="padding:14px" id="adm-dashboard-body">
+            <div class="admin-empty"><div class="ic">⏳</div><div>Chargement…</div></div>
+          </div>
+        </div>
+
+        <!-- LIKES -->
+        <div id="adm-likes" class="admin-section" style="display:none">
+          <div class="admin-section-hdr">
+            <div class="admin-section-title">❤️ Tous les likes <span class="admin-badge" id="adm-likes-count">0</span></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="admin-search" id="adm-likes-search" placeholder="🔍 Rechercher…" oninput="filterAdmLikes()">
+              <button class="adm-refresh" onclick="loadAdmLikes()">↻</button>
+            </div>
+          </div>
+          <div id="adm-likes-body"><div class="admin-empty"><div class="ic">⏳</div><div>Chargement…</div></div></div>
+        </div>
+
+        <!-- COMMENTAIRES -->
+        <div id="adm-comments" class="admin-section" style="display:none">
+          <div class="admin-section-hdr">
+            <div class="admin-section-title">💬 Tous les commentaires <span class="admin-badge" id="adm-comments-count">0</span></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="admin-search" id="adm-comments-search" placeholder="🔍 Rechercher…" oninput="filterAdmComments()">
+              <button class="adm-refresh" onclick="loadAdmComments()">↻</button>
+            </div>
+          </div>
+          <div id="adm-comments-body"><div class="admin-empty"><div class="ic">⏳</div><div>Chargement…</div></div></div>
+        </div>
+
+        <!-- SIGNALEMENTS -->
+        <div id="adm-signales" class="admin-section" style="display:none">
+          <div class="admin-section-hdr">
+            <div class="admin-section-title">🚩 Posts signalés <span class="admin-badge warn" id="adm-signales-count">0</span></div>
+            <button class="adm-refresh" onclick="loadAdmSignales()">↻</button>
+          </div>
+          <div id="adm-signales-body"><div class="admin-empty"><div class="ic">⏳</div><div>Chargement…</div></div></div>
+        </div>
+
+        <!-- UTILISATEURS -->
+        <div id="adm-users" class="admin-section" style="display:none">
+          <div class="admin-section-hdr">
+            <div class="admin-section-title">👤 Gestion Utilisateurs <span class="admin-badge" id="adm-users-count">0</span></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="admin-search" id="adm-users-search" placeholder="🔍 Rechercher…" oninput="filterAdmUsers()">
+              <button class="adm-refresh" onclick="loadAdmUsers()">↻</button>
+            </div>
+          </div>
+          <div id="adm-users-body"><div class="admin-empty"><div class="ic">⏳</div><div>Chargement…</div></div></div>
+        </div>
+
+        <!-- JOURNAL -->
+        <div id="adm-logs" class="admin-section" style="display:none">
+          <div class="admin-section-hdr">
+            <div class="admin-section-title">📋 Journal des actions admin</div>
+            <button class="adm-refresh" onclick="loadAdmLogs()">↻</button>
+          </div>
+          <div id="adm-logs-body"><div class="admin-empty"><div class="ic">⏳</div><div>Chargement…</div></div></div>
+        </div>
+
+      </div>
+    </div>
+    {% endif %}
+
+  </main>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="rsb">
+    <div class="promo card" style="background:linear-gradient(135deg,var(--g4),var(--g2));color:#fff;border:none">
+      <div class="promo-title">🌱 AgroConnect</div>
+      <div class="promo-text">Partagez vos techniques, likez et commentez pour faire avancer l'agriculture sénégalaise.</div>
+    </div>
+    <div class="card">
+      <div class="sb-title">👥 Agriculteurs actifs</div>
+      <div class="user-list" id="rightUsers"></div>
+    </div>
+    <div class="card" id="seedCard">
+      <div class="sb-title">🗄️ Base de données</div>
+      <button onclick="doSeed()" style="width:100%;padding:8px;background:var(--g3);color:var(--g4);
+              border:1.5px solid #C8E6C9;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
+        ↺ Réinitialiser les données
+      </button>
+    </div>
+  </aside>
+
+</div><!-- end layout -->
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+// CONSTANTES & ÉTAT
+// ══════════════════════════════════════════════════════════════════════════════
+const ME_PSEUDO = "{{ user_pseudo }}";
+const ME_ROLE   = "{{ user_role }}";
+const ME_ID     = null; // sera récupéré depuis allUsers
+
+let allPosts  = [];
+let allUsers  = [];
+let meUser    = null;
+let activeFilter = {uid: null, tag: null};
+let autoRunning  = false;
+
+// Données admin en cache
+let admLikesData    = [];
+let admCommentsData = [];
+let admUsersData    = [];
+let admInitialized  = { dashboard:false, likes:false, comments:false, signales:false, users:false, logs:false };
+
+// ── Couleurs avatars ───────────────────────────────────────────────────────
+const AV_COLORS = [
+  ["#E8F5E9","#1B5E20"],["#E3F2FD","#0D47A1"],["#FFF8E1","#E65100"],
+  ["#F3E5F5","#4A148C"],["#E0F7FA","#006064"],["#FBE9E7","#BF360C"],
+  ["#EDE7F6","#311B92"],["#F1F8E9","#33691E"],["#FCE4EC","#880E4F"],
+  ["#EFEBE9","#3E2723"]
+];
+function userBg(p)  { const i=Math.abs([...p].reduce((a,c)=>a+c.charCodeAt(0),0))%AV_COLORS.length; return AV_COLORS[i][0]; }
+function userColor(p){ const i=Math.abs([...p].reduce((a,c)=>a+c.charCodeAt(0),0))%AV_COLORS.length; return AV_COLORS[i][1]; }
+function ini(p)      { return (p||'?').slice(0,2).toUpperCase(); }
+function esc(s)      { const d=document.createElement('div');d.textContent=s||'';return d.innerHTML; }
+function tc(t)       { const m={irrigation:'irr',fertilisation:'fert',semences:'sem',récolte:'rec',météo:'met',maladies:'mal',insectes:'ins',exportation:'exp',bio:'bio',technique:'tec',conseil:'con',marché:'mar',eau:'eau',sol:'sol'};return m[t]||'def'; }
+function fmtDate(d)  {
+  if(!d)return '';
+  const dt=new Date(d);
+  const diff=Date.now()-dt.getTime();
+  if(diff<60000) return 'à l\'instant';
+  if(diff<3600000) return Math.floor(diff/60000)+'min';
+  if(diff<86400000) return Math.floor(diff/3600000)+'h';
+  return dt.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────
+function toast(msg, type='ok'){
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),3000);
+}
+
+// ── Lightbox ───────────────────────────────────────────────────────────────
+function lb(src){document.getElementById('lbImg').src=src;document.getElementById('lbBg').classList.add('open');}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════════════════
+async function init(){
+  await loadUsers();
+  await loadPosts();   // posts chargés AVANT buildUserSelects pour avoir les tags
+  buildUserSelects();  // maintenant allPosts est rempli → tags OK
+  loadStats();
+  checkAutoStatus();
+  if(ME_ROLE === 'admin') initAdmin();
+}
+
+async function loadUsers(){
+  const d = await fetch('/api/users').then(r=>r.json());
+  allUsers = d.users || [];
+  meUser   = allUsers.find(u=>u.pseudo===ME_PSEUDO) || null;
+  buildSideUsers();
+}
+
+async function loadPosts(){
+  const params = new URLSearchParams();
+  if(activeFilter.uid) params.set('auteur_id', activeFilter.uid);
+  if(activeFilter.tag) params.set('tag', activeFilter.tag);
+  const d = await fetch('/api/posts?'+params).then(r=>r.json());
+  allPosts = d.posts || [];
+  renderFeed(allPosts);
+}
+
+async function loadStats(){
+  const d = await fetch('/api/stats').then(r=>r.json());
+  document.getElementById('statPosts').textContent = d.nb_posts  || 0;
+  document.getElementById('statLikes').textContent = d.nb_likes  || 0;
+  if(ME_ROLE==='admin'){
+    document.getElementById('kpi-posts').textContent    = d.nb_posts    || 0;
+    document.getElementById('kpi-likes').textContent    = d.nb_likes    || 0;
+    document.getElementById('kpi-comments').textContent = d.nb_comments || 0;
+    document.getElementById('kpi-users').textContent    = d.nb_users    || 0;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// VUES
+// ══════════════════════════════════════════════════════════════════════════════
+function switchView(v, btn){
+  ['feed','requetes','top3','admin'].forEach(x=>{
+    const el=document.getElementById('view-'+x);
+    if(el) el.style.display = x===v ? '' : 'none';
+  });
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  if(v==='top3')   loadTop3();
+  if(v==='requetes') buildRqSelects();
+  if(v==='admin')  initAdmin();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SIDEBARS
+// ══════════════════════════════════════════════════════════════════════════════
+function buildSideUsers(){
+  const el=document.getElementById('sideUsers');
+  el.innerHTML = allUsers.slice(0,10).map(u=>`
+    <div class="mi" onclick="applyFilter('${u._id}',null)">
+      <div class="av mi-ic" style="width:22px;height:22px;background:${userBg(u.pseudo)};color:${userColor(u.pseudo)};font-size:8px">${ini(u.pseudo)}</div>
+      <span style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(u.pseudo)}</span>
+    </div>`).join('');
+
+  const rightEl=document.getElementById('rightUsers');
+  rightEl.innerHTML = allUsers.slice(0,6).map(u=>`
+    <div class="ul-item" onclick="applyFilter('${u._id}',null)">
+      <div class="av" style="width:32px;height:32px;background:${userBg(u.pseudo)};color:${userColor(u.pseudo)};font-size:10px">${ini(u.pseudo)}</div>
+      <div class="ul-info">
+        <div class="name">${esc(u.pseudo)}</div>
+        <div class="sub">📍 ${esc(u.region||'')} · ${esc(u.type_culture||'')}</div>
+      </div>
+    </div>`).join('');
+
+  // Tags
+  const tagSet=new Set();
+  allPosts.forEach(p=>(p.tags||[]).forEach(t=>tagSet.add(t)));
+  document.getElementById('sideTags').innerHTML=[...tagSet].slice(0,15).map(t=>
+    `<span class="tag ${tc(t)}" onclick="applyFilter(null,'${t}')">#${t}</span>`).join('');
+}
+
+function buildUserSelects(){
+  const opts = allUsers.map(u=>`<option value="${u._id}">${u.pseudo}</option>`).join('');
+  document.getElementById('userFilter').innerHTML = '<option value="">👤 Tous les agriculteurs</option>'+opts;
+
+  // Tags uniques depuis tous les posts
+  const tagSet = new Set();
+  allPosts.forEach(p=>(p.tags||[]).forEach(t=>tagSet.add(t)));
+  const tagOpts = [...tagSet].sort().map(t=>`<option value="${t}">#${t}</option>`).join('');
+  document.getElementById('tagFilter').innerHTML = '<option value="">🏷️ Tous les tags</option>'+tagOpts;
+
+  const rqU = document.getElementById('rqUser');
+  if(rqU) rqU.innerHTML = '<option value="">— choisir —</option>'+opts;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// FILTRES
+// ══════════════════════════════════════════════════════════════════════════════
+function applyFilter(uid=null, tag=null){
+  activeFilter={uid,tag};
+  document.querySelectorAll('.mi').forEach(m=>m.classList.remove('on'));
+  if(!uid&&!tag){ document.getElementById('mi-all')?.classList.add('on'); }
+  if(uid){ document.getElementById('userFilter').value=uid; }
+  if(tag){ document.getElementById('tagFilter').value=tag; }
+  loadPosts();
+}
+function onUserFilter(){ const v=document.getElementById('userFilter').value; applyFilter(v||null,activeFilter.tag); }
+function onTagFilter(){  const v=document.getElementById('tagFilter').value;  applyFilter(activeFilter.uid,v||null); }
+function clearFilters(){ document.getElementById('userFilter').value=''; document.getElementById('tagFilter').value=''; applyFilter(null,null); }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// FEED
+// ══════════════════════════════════════════════════════════════════════════════
+function renderFeed(posts){
+  const el=document.getElementById('feedCont');
+  if(!posts.length){
+    el.innerHTML='<div class="empty"><div class="empty-ic">🌾</div><div>Aucune publication trouvée.</div></div>';
+    return;
+  }
+  el.innerHTML = posts.map(p=>buildPost(p)).join('');
+
+  // Tags sidebar après rendu
+  const tagSet=new Set();
+  posts.forEach(p=>(p.tags||[]).forEach(t=>tagSet.add(t)));
+  document.getElementById('sideTags').innerHTML=[...tagSet].slice(0,15).map(t=>
+    `<span class="tag ${tc(t)}" onclick="applyFilter(null,'${t}')">#${t}</span>`).join('');
+}
+
+function buildPost(p){
+  const isLiked  = meUser && (p.likes||[]).includes(meUser._id);
+  const isSignale= meUser && (p.signalements||[]).includes(meUser._id);
+  const nbSignal = (p.signalements||[]).length;
+  const lkCnt    = (p.likes||[]).length;
+  const cmCnt    = (p.commentaires||[]).length;
+  const isPin    = !!p.epingle;
+  const auteur   = allUsers.find(u=>u._id===p.auteur_id) || {pseudo: p.auteur_pseudo, region:'', type_culture:''};
+
+  return `
+  <div class="post${isPin?' pinned':''}" id="post-${p._id}">
+    ${isPin?`<div class="pin-badge">📌 Publication épinglée</div>`:''}
+    <div class="post-hdr">
+      <div class="av" style="background:${userBg(p.auteur_pseudo)};color:${userColor(p.auteur_pseudo)}"
+           onclick="applyFilter('${p.auteur_id}',null)">${ini(p.auteur_pseudo)}</div>
+      <div class="post-meta">
+        <div class="post-author" onclick="applyFilter('${p.auteur_id}',null)">${esc(p.auteur_pseudo)}</div>
+        <div class="post-sub">📍 ${esc(auteur.region||'')} · ${esc(auteur.type_culture||'')} · ${fmtDate(p.date)}</div>
+      </div>
+    </div>
+    ${p.image?`<img class="post-img" src="${p.image}" onclick="lb(this.src)" alt="" loading="lazy">`:''}
+    <div class="post-body">${esc(p.contenu)}</div>
+    ${(p.tags||[]).length?`<div class="post-tags">${p.tags.map(t=>`<span class="tag ${tc(t)}" onclick="applyFilter(null,'${t}')">#${t}</span>`).join('')}</div>`:''}
+    <div class="react-bar">
+      <div class="rc" onclick="showLikers('${p._id}')">❤️ <span id="lk-${p._id}">${lkCnt}</span> j'aime</div>
+      <div class="rc" onclick="togCw('${p._id}')">💬 <span id="cm-${p._id}">${cmCnt}</span> commentaire${cmCnt!==1?'s':''}</div>
+      ${nbSignal>0?`<div class="rc" style="color:var(--warn)">🚩 ${nbSignal} signalement${nbSignal>1?'s':''}</div>`:''}
+    </div>
+    <div class="post-acts">
+      <button class="pa${isLiked?' liked':''}" id="lb-${p._id}" onclick="like('${p._id}')">
+        <svg viewBox="0 0 24 24" fill="${isLiked?'currentColor':'none'}" stroke="currentColor" stroke-width="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        J'aime
+      </button>
+      <button class="pa" onclick="togCw('${p._id}')">💬 Commenter</button>
+      <button class="pa${isSignale?' signale':''}" onclick="signaler('${p._id}')" title="Signaler ce post">
+        🚩 ${isSignale?'Signalé':'Signaler'}${nbSignal>0?`<span class="signal-badge">${nbSignal}</span>`:''}
+      </button>
+      ${ME_ROLE==='admin'?`
+      <div class="pa-admin">
+        <button class="pa pin${isPin?' liked':''}" onclick="toggleEpingle('${p._id}')" title="${isPin?'Désépingler':'Épingler'}">
+          📌 ${isPin?'Désépingler':'Épingler'}
+        </button>
+        <button class="pa del-post" onclick="deletePost('${p._id}')" title="Supprimer ce post">🗑 Supprimer</button>
+      </div>`:''}
+    </div>
+    <div class="cw" id="cw-${p._id}">
+      <div class="comm-list" id="cl-${p._id}">
+        ${(p.commentaires||[]).map(c=>`
+          <div class="comm">
+            <div class="comm-av" style="background:${userBg(c.auteur_pseudo)};color:${userColor(c.auteur_pseudo)}">${ini(c.auteur_pseudo)}</div>
+            <div class="comm-body">
+              <div class="comm-author">${esc(c.auteur_pseudo)}</div>
+              <div class="comm-text">${esc(c.texte)}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div class="comm-input-row">
+        <input class="comm-input" id="ci-${p._id}" placeholder="Votre commentaire…"
+               onkeydown="if(event.key==='Enter')addComm('${p._id}')">
+        <button class="comm-send" onclick="addComm('${p._id}')">Envoyer</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ACTIONS POST
+// ══════════════════════════════════════════════════════════════════════════════
+function togCw(pid){
+  const el=document.getElementById('cw-'+pid);
+  el.classList.toggle('open');
+  if(el.classList.contains('open')) document.getElementById('ci-'+pid)?.focus();
+}
+
+async function like(pid){
+  const uid = meUser?._id;
+  if(!uid){ toast('Compte introuvable','err'); return; }
+  const d=await fetch('/api/like',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({post_id:pid,user_id:uid})}).then(r=>r.json());
+  document.getElementById('lk-'+pid).textContent = d.likes;
+  const btn=document.getElementById('lb-'+pid);
+  btn.classList.toggle('liked',d.liked);
+  btn.querySelector('svg').setAttribute('fill',d.liked?'currentColor':'none');
+  const p=allPosts.find(x=>x._id===pid);
+  if(p){if(d.liked)p.likes.push(uid);else p.likes=p.likes.filter(l=>l!==uid);}
+  loadStats();
+}
+
+async function addComm(pid){
+  const inp=document.getElementById('ci-'+pid);
+  const texte=inp.value.trim();
+  if(!texte)return;
+  const d=await fetch('/api/comment',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({post_id:pid,texte})}).then(r=>r.json());
+  if(d.ok){
+    inp.value='';
+    const cl=document.getElementById('cl-'+pid);
+    const pseudo=ME_PSEUDO;
+    cl.insertAdjacentHTML('beforeend',`
+      <div class="comm">
+        <div class="comm-av" style="background:${userBg(pseudo)};color:${userColor(pseudo)}">${ini(pseudo)}</div>
+        <div class="comm-body">
+          <div class="comm-author">${esc(pseudo)}</div>
+          <div class="comm-text">${esc(texte)}</div>
+        </div>
+      </div>`);
+    const cmEl=document.getElementById('cm-'+pid);
+    if(cmEl) cmEl.textContent=parseInt(cmEl.textContent||0)+1;
+    const p=allPosts.find(x=>x._id===pid);
+    if(p)p.commentaires.push({auteur_pseudo:pseudo,texte});
+    loadStats();
+  }
+}
+
+async function signaler(pid){
+  const d=await fetch('/api/signaler',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({post_id:pid})}).then(r=>r.json());
+  if(d.ok){
+    toast(d.signale?'🚩 Post signalé':'🚩 Signalement retiré','warn');
+    loadPosts(); // Rafraîchir pour mettre à jour le badge
+  }
+}
+
+async function publishPost(){
+  const txt  = document.getElementById('npText').value.trim();
+  const tags = document.getElementById('npTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  if(!txt){ toast('Le contenu est vide','err'); return; }
+  const btn=document.getElementById('npBtn');
+  btn.disabled=true;
+  const d=await fetch('/api/post/create',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contenu:txt,tags})}).then(r=>r.json());
+  if(d.ok){
+    document.getElementById('npText').value='';
+    document.getElementById('npTags').value='';
+    allPosts.unshift(d.post);
+    renderFeed(allPosts);
+    loadStats();
+    toast('📢 Publication créée !','ok');
+  }
+  btn.disabled=false;
+}
+
+// ── Popup likers ──────────────────────────────────────────────────────────
+function showLikers(pid){
+  const p=allPosts.find(x=>x._id===pid);
+  if(!p)return;
+  const likers=(p.likes||[]).map(id=>{const u=allUsers.find(x=>x._id===id);return u||null;}).filter(Boolean);
+  const old=document.getElementById('likers-popup');if(old)old.remove();
+  const popup=document.createElement('div');
+  popup.id='likers-popup';
+  popup.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:14px;border:1px solid var(--brd);box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:300;min-width:280px;max-width:380px;overflow:hidden';
+  popup.innerHTML=`
+    <div style="background:linear-gradient(135deg,var(--g4),var(--g2));padding:14px 18px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-family:'Syne',sans-serif;font-weight:800;color:#fff;font-size:15px">❤️ ${likers.length} j'aime</span>
+      <button onclick="document.getElementById('likers-popup').remove()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:14px">✕</button>
+    </div>
+    <div style="padding:10px 14px;max-height:280px;overflow-y:auto">
+      ${!likers.length?'<div style="color:var(--mu);text-align:center;padding:16px">Aucun like pour l\'instant.</div>':
+        likers.map(u=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--brd)">
+          <div style="width:34px;height:34px;border-radius:50%;background:${userBg(u.pseudo)};color:${userColor(u.pseudo)};display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:10px;flex-shrink:0">${ini(u.pseudo)}</div>
+          <div><div style="font-weight:700;font-size:13px">${esc(u.pseudo)}</div><div style="font-size:11px;color:var(--mu)">📍 ${esc(u.region||'')} · ${esc(u.type_culture||'')}</div></div>
+        </div>`).join('')}
+    </div>
+    ${ME_ROLE==='admin'?`<div style="padding:10px 14px;border-top:1px solid var(--brd);text-align:right">
+      <button onclick="document.querySelectorAll('.ntab')[3].click();admTab('likes');document.getElementById('likers-popup').remove()"
+              style="padding:6px 14px;background:var(--g);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">⚙️ Gérer dans Admin</button>
+    </div>`:''}
+  `;
+  document.body.appendChild(popup);
+  setTimeout(()=>document.addEventListener('click',function h(e){if(!popup.contains(e.target)){popup.remove();document.removeEventListener('click',h);}},),50);
+}
+
+// ── Admin actions sur post ────────────────────────────────────────────────
+async function toggleEpingle(pid){
+  const d=await fetch('/api/admin/toggle_epingle',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({post_id:pid})}).then(r=>r.json());
+  if(d.ok){ toast(d.epingle?'📌 Post épinglé':'📌 Post désépinglé','ok'); loadPosts(); }
+  else toast('Erreur','err');
+}
+async function deletePost(pid){
+  if(!confirm('Supprimer définitivement ce post ?'))return;
+  const d=await fetch('/api/admin/delete_post',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({post_id:pid})}).then(r=>r.json());
+  if(d.ok){ toast('🗑 Post supprimé','ok'); allPosts=allPosts.filter(p=>p._id!==pid); renderFeed(allPosts); loadStats(); }
+  else toast('Erreur suppression','err');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOP 3
+// ══════════════════════════════════════════════════════════════════════════════
+async function loadTop3(){
+  const el=document.getElementById('top3Cont');
+  el.innerHTML='<div class="loading"><div class="spinner"></div>Chargement…</div>';
+  const d=await fetch('/api/top3').then(r=>r.json());
+  const posts=d.posts||[];
+  if(!posts.length){el.innerHTML='<div class="empty"><div class="empty-ic">🏆</div><div>Aucune donnée.</div></div>';return;}
+  const medals=['🥇','🥈','🥉'];
+  el.innerHTML=posts.map((p,i)=>`
+    <div class="post" style="border-left:4px solid #FFD700">
+      <div class="post-hdr">
+        <div class="av" style="background:${userBg(p.auteur_pseudo)};color:${userColor(p.auteur_pseudo)}">${ini(p.auteur_pseudo)}</div>
+        <div class="post-meta">
+          <div class="post-author">${medals[i]} ${esc(p.auteur_pseudo)} <span class="top3-badge">${(p.likes||[]).length} ❤️</span></div>
+          <div class="post-sub">${fmtDate(p.date)}</div>
+        </div>
+      </div>
+      <div class="post-body">${esc(p.contenu)}</div>
+      ${(p.tags||[]).map(t=>`<span class="tag ${tc(t)}" style="margin:0 4px 8px 14px">#${t}</span>`).join('')}
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// REQUÊTES
+// ══════════════════════════════════════════════════════════════════════════════
+function buildRqSelects(){
+  const sel=document.getElementById('rqUser');
+  if(sel && sel.options.length<=1){
+    allUsers.forEach(u=>sel.insertAdjacentHTML('beforeend',`<option value="${u.pseudo}">${u.pseudo}</option>`));
+  }
+}
+async function rqTag(){
+  const tag=document.getElementById('rqTag').value.trim();
+  if(!tag){toast('Entrez un tag','err');return;}
+  const d=await fetch(`/api/posts?tag=${encodeURIComponent(tag)}`).then(r=>r.json());
+  showRqResults(d.posts||[], `Publications avec #${tag}`);
+}
+async function rqSuivis(){
+  const pseudo=document.getElementById('rqUser').value;
+  if(!pseudo){toast('Choisissez un agriculteur','err');return;}
+  const d=await fetch(`/api/users`).then(r=>r.json());
+  const user=d.users.find(u=>u.pseudo===pseudo);
+  if(!user){toast('Utilisateur non trouvé','err');return;}
+  const followingIds=user.following||[];
+  const posts=allPosts.filter(p=>followingIds.includes(p.auteur_id));
+  showRqResults(posts, `Publications des personnes suivies par ${pseudo}`);
+}
+function showRqResults(posts, title){
+  const el=document.getElementById('rqResults');
+  el.innerHTML=`<div style="font-weight:700;margin-bottom:10px;color:var(--mu)">${esc(title)} — ${posts.length} résultat(s)</div>`;
+  if(!posts.length){el.insertAdjacentHTML('beforeend','<div class="empty"><div class="empty-ic">🔍</div><div>Aucun résultat.</div></div>');return;}
+  el.insertAdjacentHTML('beforeend','<div class="feed">'+posts.map(p=>buildPost(p)).join('')+'</div>');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// AUTO-PUBLISHER
+// ══════════════════════════════════════════════════════════════════════════════
+async function toggleAuto(){
+  const btn=document.getElementById('autoBtn');
+  if(autoRunning){
+    await fetch('/api/auto/stop',{method:'POST'});
+    autoRunning=false;
+    btn.className='auto-btn start'; btn.textContent='▶ Auto';
+    toast('⏹ Auto-publisher arrêté','warn');
+  } else {
+    await fetch('/api/auto/start',{method:'POST'});
+    autoRunning=true;
+    btn.className='auto-btn stop'; btn.textContent='⏹ Stop';
+    toast('▶ Auto-publisher démarré','ok');
+    setInterval(loadPosts, 8000);
+  }
+}
+async function checkAutoStatus(){
+  const d=await fetch('/api/auto/status').then(r=>r.json());
+  autoRunning=d.running;
+  const btn=document.getElementById('autoBtn');
+  if(autoRunning){ btn.className='auto-btn stop'; btn.textContent='⏹ Stop'; }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SEED
+// ══════════════════════════════════════════════════════════════════════════════
+async function doSeed(){
+  if(!confirm('Réinitialiser la base de données ? Toutes les données seront perdues.'))return;
+  const d=await fetch('/api/seed',{method:'POST'}).then(r=>r.json());
+  if(d.ok){ toast('✅ Base réinitialisée','ok'); setTimeout(()=>location.reload(),1000); }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ADMIN — INITIALISATION
+// ══════════════════════════════════════════════════════════════════════════════
+function admTab(tab){
+  ['dashboard','likes','comments','signales','users','logs'].forEach(t=>{
+    const el=document.getElementById('adm-'+t);
+    if(el) el.style.display = t===tab?'':'none';
+  });
+  document.querySelectorAll('.atab').forEach((b,i)=>{
+    const tabs=['dashboard','likes','comments','signales','users','logs'];
+    b.classList.toggle('on', tabs[i]===tab);
+  });
+  // Charger les données si pas encore fait
+  if(tab==='dashboard' && !admInitialized.dashboard) loadAdmDashboard();
+  if(tab==='likes'     && !admInitialized.likes)     loadAdmLikes();
+  if(tab==='comments'  && !admInitialized.comments)  loadAdmComments();
+  if(tab==='signales'  && !admInitialized.signales)  loadAdmSignales();
+  if(tab==='users'     && !admInitialized.users)     loadAdmUsers();
+  if(tab==='logs'      && !admInitialized.logs)      loadAdmLogs();
+}
+
+async function initAdmin(){
+  if(!admInitialized.dashboard) loadAdmDashboard();
+  // Compter les signalements et afficher le badge nav
+  const d = await fetch('/api/admin/signales').then(r=>r.json());
+  const nb = (d.posts||[]).length;
+  document.getElementById('kpi-signales').textContent         = nb;
+  document.getElementById('signales-count-badge').textContent = nb;
+  document.getElementById('adm-signales-count').textContent   = nb;
+  // Badge orange sur l'onglet Admin dans la nav
+  const navBadge = document.getElementById('nav-signal-badge');
+  if(navBadge){
+    navBadge.textContent    = nb;
+    navBadge.style.display  = nb > 0 ? 'inline' : 'none';
+  }
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────
+async function loadAdmDashboard(){
+  admInitialized.dashboard=true;
+  const el=document.getElementById('adm-dashboard-body');
+  el.innerHTML='<div class="admin-empty"><div class="ic">⏳</div><div>Chargement…</div></div>';
+  const d=await fetch('/api/admin/dashboard').then(r=>r.json());
+
+  // Posts par jour
+  const pjKeys=Object.keys(d.posts_par_jour||{});
+  const pjVals=Object.values(d.posts_par_jour||{});
+  const pjMax=Math.max(...pjVals,1);
+
+  // Top users
+  const topUsers=d.top_users||[];
+  const tuMax=Math.max(...topUsers.map(u=>u.score),1);
+
+  // Tags
+  const topTags=d.top_tags||[];
+  const tagMax=Math.max(...topTags.map(t=>t[1]),1);
+
+  el.innerHTML=`
+  <div class="dash-grid">
+    <div class="dash-card">
+      <div class="dash-card-title">📅 Activité — 7 derniers jours</div>
+      ${pjKeys.map((k,i)=>`
+        <div class="bar-row">
+          <div class="bar-label">${k}</div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(pjVals[i]/pjMax*100)}%"></div></div>
+          <div class="bar-val">${pjVals[i]}</div>
+        </div>`).join('')}
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-title">🏆 Top 5 Agriculteurs actifs</div>
+      ${topUsers.map(u=>`
+        <div class="bar-row">
+          <div class="bar-label" title="${esc(u.pseudo)}">${esc(u.pseudo)}</div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(u.score/tuMax*100)}%;background:var(--warn)"></div></div>
+          <div class="bar-val">${u.score}</div>
+        </div>`).join('')}
+    </div>
+    <div class="dash-card" style="grid-column:1/-1">
+      <div class="dash-card-title">🏷️ Tags les plus utilisés</div>
+      <div class="tag-cloud">
+        ${topTags.map(([tag,cnt])=>`
+          <span class="tag ${tc(tag)}" style="font-size:${11+Math.round(cnt/tagMax*6)}px">
+            #${esc(tag)} <b>${cnt}</b>
+          </span>`).join('')}
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <div class="kpi" style="background:var(--g3);flex:1">
+      <div class="kpi-v" style="color:var(--g4)">${d.nb_suspendus||0}</div>
+      <div class="kpi-l" style="color:var(--g4)">🔴 Comptes suspendus</div>
+    </div>
+    <div class="kpi" style="background:#FFF8E1;flex:1">
+      <div class="kpi-v" style="color:var(--warn)">${d.nb_signales||0}</div>
+      <div class="kpi-l" style="color:var(--warn)">🚩 Posts signalés</div>
+    </div>
+  </div>`;
+}
+
+// ── LIKES ─────────────────────────────────────────────────────────────────
+async function loadAdmLikes(){
+  admInitialized.likes=true;
+  document.getElementById('adm-likes-body').innerHTML='<div class="admin-empty"><div class="ic">⏳</div></div>';
+  const d=await fetch('/api/admin/likes').then(r=>r.json());
+  admLikesData=d.likes||[];
+  document.getElementById('adm-likes-count').textContent=admLikesData.length;
+  renderAdmLikes(admLikesData);
+}
+function filterAdmLikes(){
+  const q=document.getElementById('adm-likes-search').value.toLowerCase();
+  renderAdmLikes(!q?admLikesData:admLikesData.filter(l=>
+    (l.user_pseudo+l.post_auteur+l.post_contenu+l.user_region).toLowerCase().includes(q)));
+}
+function renderAdmLikes(data){
+  const el=document.getElementById('adm-likes-body');
+  if(!data.length){el.innerHTML='<div class="admin-empty"><div class="ic">❤️</div><div>Aucun like.</div></div>';return;}
+  el.innerHTML=`<div style="overflow-x:auto"><table class="admin-table">
+    <thead><tr><th>Utilisateur</th><th>Région / Culture</th><th>Publication</th><th>Action</th></tr></thead>
+    <tbody>${data.map((l,i)=>`<tr>
+      <td><div class="adm-user">
+        <div class="adm-av" style="background:${userBg(l.user_pseudo)};color:${userColor(l.user_pseudo)}">${ini(l.user_pseudo)}</div>
+        <div class="adm-user-info"><div class="name">${esc(l.user_pseudo)}</div></div>
+      </div></td>
+      <td><span style="font-size:11px;color:var(--mu)">📍 ${esc(l.user_region)} · ${esc(l.user_culture)}</span></td>
+      <td class="adm-post-cell">
+        <div class="adm-post-author">✍️ ${esc(l.post_auteur)}</div>
+        <div class="adm-post-excerpt">${esc(l.post_contenu)}…</div>
+      </td>
+      <td><button class="del-btn" onclick="admRemoveLike('${l.post_id}','${l.user_id}',${i})">🗑 Supprimer</button></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+async function admRemoveLike(postId,userId,idx){
+  if(!confirm('Supprimer ce like ?'))return;
+  const d=await fetch('/api/admin/remove_like',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({post_id:postId,user_id:userId})}).then(r=>r.json());
+  if(d.ok){
+    admLikesData.splice(idx,1);
+    document.getElementById('adm-likes-count').textContent=admLikesData.length;
+    filterAdmLikes();
+    loadStats();
+    toast('❤️ Like supprimé','ok');
+  } else toast('Erreur','err');
+}
+
+// ── COMMENTAIRES ──────────────────────────────────────────────────────────
+async function loadAdmComments(){
+  admInitialized.comments=true;
+  document.getElementById('adm-comments-body').innerHTML='<div class="admin-empty"><div class="ic">⏳</div></div>';
+  const d=await fetch('/api/admin/comments').then(r=>r.json());
+  admCommentsData=d.comments||[];
+  document.getElementById('adm-comments-count').textContent=admCommentsData.length;
+  renderAdmComments(admCommentsData);
+}
+function filterAdmComments(){
+  const q=document.getElementById('adm-comments-search').value.toLowerCase();
+  renderAdmComments(!q?admCommentsData:admCommentsData.filter(c=>
+    (c.auteur_pseudo+c.texte+c.post_auteur).toLowerCase().includes(q)));
+}
+function renderAdmComments(data){
+  const el=document.getElementById('adm-comments-body');
+  if(!data.length){el.innerHTML='<div class="admin-empty"><div class="ic">💬</div><div>Aucun commentaire.</div></div>';return;}
+  el.innerHTML=`<div style="overflow-x:auto"><table class="admin-table">
+    <thead><tr><th>Auteur</th><th>Commentaire</th><th>Publication</th><th>Date</th><th>Action</th></tr></thead>
+    <tbody>${data.map((c,i)=>`<tr>
+      <td><div class="adm-user">
+        <div class="adm-av" style="background:${userBg(c.auteur_pseudo)};color:${userColor(c.auteur_pseudo)}">${ini(c.auteur_pseudo)}</div>
+        <div class="adm-user-info"><div class="name">${esc(c.auteur_pseudo)}</div></div>
+      </div></td>
+      <td><div class="adm-comment-text">💬 ${esc(c.texte)}</div></td>
+      <td class="adm-post-cell">
+        <div class="adm-post-author">✍️ ${esc(c.post_auteur)}</div>
+        <div class="adm-post-excerpt">${esc(c.post_contenu)}…</div>
+      </td>
+      <td class="adm-date">${c.date?new Date(c.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'-'}</td>
+      <td><button class="del-btn" onclick="admRemoveComment('${c.post_id}',${c.comment_index},'${esc(c.auteur_pseudo)}',${i})">🗑 Supprimer</button></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+async function admRemoveComment(postId,commentIndex,auteur,idx){
+  if(!confirm(`Supprimer le commentaire de "${auteur}" ?`))return;
+  const d=await fetch('/api/admin/remove_comment',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({post_id:postId,comment_index:commentIndex})}).then(r=>r.json());
+  if(d.ok){
+    admCommentsData.splice(idx,1);
+    admCommentsData.forEach(c=>{if(c.post_id===postId&&c.comment_index>commentIndex)c.comment_index--;});
+    document.getElementById('adm-comments-count').textContent=admCommentsData.length;
+    filterAdmComments();
+    loadStats();
+    toast('💬 Commentaire supprimé','ok');
+  } else toast('Erreur','err');
+}
+
+// ── SIGNALEMENTS ──────────────────────────────────────────────────────────
+async function loadAdmSignales(){
+  admInitialized.signales=true;
+  const el=document.getElementById('adm-signales-body');
+  el.innerHTML='<div class="admin-empty"><div class="ic">⏳</div></div>';
+  const d=await fetch('/api/admin/signales').then(r=>r.json());
+  const posts=d.posts||[];
+  document.getElementById('adm-signales-count').textContent=posts.length;
+  document.getElementById('signales-count-badge').textContent=posts.length;
+  document.getElementById('kpi-signales').textContent=posts.length;
+  if(!posts.length){el.innerHTML='<div class="admin-empty"><div class="ic">✅</div><div>Aucun post signalé.</div></div>';return;}
+  el.innerHTML='<div class="feed" style="padding:12px">'+posts.map(p=>buildPost(p)).join('')+'</div>';
+}
+
+// ── UTILISATEURS ──────────────────────────────────────────────────────────
+async function loadAdmUsers(){
+  admInitialized.users=true;
+  document.getElementById('adm-users-body').innerHTML='<div class="admin-empty"><div class="ic">⏳</div></div>';
+  const d=await fetch('/api/admin/users').then(r=>r.json());
+  admUsersData=d.users||[];
+  document.getElementById('adm-users-count').textContent=admUsersData.length;
+  renderAdmUsers(admUsersData);
+}
+function filterAdmUsers(){
+  const q=document.getElementById('adm-users-search').value.toLowerCase();
+  renderAdmUsers(!q?admUsersData:admUsersData.filter(u=>
+    (u.pseudo+u.region+u.type_culture).toLowerCase().includes(q)));
+}
+function renderAdmUsers(data){
+  const el=document.getElementById('adm-users-body');
+  if(!data.length){el.innerHTML='<div class="admin-empty"><div class="ic">👤</div><div>Aucun utilisateur.</div></div>';return;}
+  el.innerHTML=`<div style="overflow-x:auto"><table class="admin-table">
+    <thead><tr><th>Utilisateur</th><th>Région / Culture</th><th>Rôle</th><th>Stats</th><th>Statut</th><th>Actions</th></tr></thead>
+    <tbody>${data.map((u,i)=>`<tr id="adm-user-row-${i}">
+      <td><div class="adm-user">
+        <div class="adm-av" style="background:${userBg(u.pseudo)};color:${userColor(u.pseudo)}">${ini(u.pseudo)}</div>
+        <div class="adm-user-info"><div class="name">${esc(u.pseudo)}</div></div>
+      </div></td>
+      <td><span style="font-size:11px;color:var(--mu)">📍 ${esc(u.region||'?')} · ${esc(u.type_culture||'?')}</span></td>
+      <td><span style="font-size:11px;font-weight:700;color:${u.role==='admin'?'var(--warn)':'var(--g4)'}">
+        ${u.role==='admin'?'👑 Admin':'🌾 User'}
+      </span></td>
+      <td><span style="font-size:11px;color:var(--mu)">📝${u.nb_posts||0} ❤️${u.nb_likes||0} 💬${u.nb_comments||0}</span></td>
+      <td><span class="adm-status ${u.statut||'actif'}">${u.statut==='suspendu'?'🔴 Suspendu':'🟢 Actif'}</span></td>
+      <td>
+        ${u.role!=='admin'?`
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            ${u.statut==='suspendu'
+              ?`<button class="react-btn" onclick="admReactivate('${u._id}',${i})">🟢 Réactiver</button>`
+              :`<button class="susp-btn"  onclick="admSuspend('${u._id}',${i})">🔴 Suspendre</button>`}
+            <button class="del-btn" onclick="admDeleteUser('${u._id}','${esc(u.pseudo)}',${i})">🗑 Supprimer</button>
+          </div>`:
+          '<span style="font-size:11px;color:var(--mu)">—</span>'}
+      </td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+async function admSuspend(uid,idx){
+  if(!confirm('Suspendre cet utilisateur ?'))return;
+  const d=await fetch('/api/admin/suspend',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({user_id:uid})}).then(r=>r.json());
+  if(d.ok){ toast('🔴 Utilisateur suspendu','warn'); admUsersData[idx].statut='suspendu'; renderAdmUsers(admUsersData); }
+  else toast('Erreur','err');
+}
+async function admReactivate(uid,idx){
+  if(!confirm('Réactiver cet utilisateur ?'))return;
+  const d=await fetch('/api/admin/reactivate',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({user_id:uid})}).then(r=>r.json());
+  if(d.ok){ toast('🟢 Utilisateur réactivé','ok'); admUsersData[idx].statut='actif'; renderAdmUsers(admUsersData); }
+  else toast('Erreur','err');
+}
+async function admDeleteUser(uid,pseudo,idx){
+  if(!confirm(`Supprimer définitivement le compte "${pseudo}" et tous ses posts ?`))return;
+  const d=await fetch('/api/admin/delete_user',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({user_id:uid})}).then(r=>r.json());
+  if(d.ok){
+    toast('🗑 Utilisateur supprimé','ok');
+    admUsersData.splice(idx,1);
+    document.getElementById('adm-users-count').textContent=admUsersData.length;
+    renderAdmUsers(admUsersData);
+    loadPosts(); loadStats();
+  } else toast(d.error||'Erreur','err');
+}
+
+// ── JOURNAL ───────────────────────────────────────────────────────────────
+const LOG_ICONS={DELETE_POST:'🗑',PIN_POST:'📌',UNPIN_POST:'📌',REMOVE_LIKE:'❤️',
+                  REMOVE_COMMENT:'💬',SUSPEND_USER:'🔴',REACTIVATE_USER:'🟢',DELETE_USER:'🗑'};
+async function loadAdmLogs(){
+  admInitialized.logs=true;
+  const el=document.getElementById('adm-logs-body');
+  el.innerHTML='<div class="admin-empty"><div class="ic">⏳</div></div>';
+  const d=await fetch('/api/admin/logs').then(r=>r.json());
+  const logs=d.logs||[];
+  if(!logs.length){el.innerHTML='<div class="admin-empty"><div class="ic">📋</div><div>Aucune action enregistrée.</div></div>';return;}
+  el.innerHTML=logs.map(l=>`
+    <div class="log-row">
+      <div class="log-icon">${LOG_ICONS[l.type_action]||'⚙️'}</div>
+      <div class="log-info">
+        <div class="log-action"><b>${esc(l.admin_pseudo)}</b> — ${esc(l.type_action)}</div>
+        <div class="log-details">${esc(l.details)}</div>
+      </div>
+      <div class="log-date">${l.date?new Date(l.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):''}</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DÉMARRAGE
+// ══════════════════════════════════════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
